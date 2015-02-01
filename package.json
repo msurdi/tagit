@@ -1,0 +1,21 @@
+{
+  "name": "tagit",
+  "version": "1.0.0",
+  "description": "File tagging tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "file",
+    "tag",
+    "indexing"
+  ],
+  "author": "Matias Surdi",
+  "license": "BSD",
+  "dependencies": {
+    "commander": "^2.6.0",
+    "findit": "^2.0.0",
+    "underscore": "^1.7.0"
+  }
+}
