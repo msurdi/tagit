@@ -1,6 +1,7 @@
 "use strict";
 
 var program = require('commander');
+var _ = require('underscore');
 var tagit = require('./tagit');
 
 program
@@ -28,9 +29,9 @@ program
 
 program
     .command('update')
-    .description('Update the index by adding new files and removing non existing ones')
-    .action(function () {
-        tagit.update();
+    .description('Update the index by adding new files and removing missing ones')
+    .action(function (options) {
+        tagit.update(getDir(options));
     });
 
 program
@@ -38,18 +39,16 @@ program
     .description("Tag a file with the given tags")
     .action(function (f, tag, otherTags, options) {
         var allTags = otherTags || [];
-        var dir = options.parent.directory || ".";
         allTags.push(tag);
         console.log('Tagging file %s with tags %s', f, allTags.toString());
-        tagit.tag(dir, f, allTags);
+        tagit.tag(getDir(options), f, allTags);
     });
 
 program
     .command('tags <file>')
     .description('List current tags for the given file')
     .action(function (f, options) {
-        var dir = options.parent.directory || ".";
-        console.log(tagit.tags(dir, f));
+        console.log(tagit.tags(getDir(options), f));
     }
 );
 
@@ -72,9 +71,14 @@ program
     .command('remove <file>')
     .description('remove file from index')
     .action(function (f, options) {
-
     });
 
+program
+    .command('random [tags...]')
+    .description('Choose a random file matching the specified tags.')
+    .action(function (tags, options) {
+        console.log(tagit.random(getDir(options.parent), tags));
+    });
 
 program
     .command('*')
@@ -88,4 +92,10 @@ program.parse(process.argv);
 
 if (program.args.length === 0) {
     program.help();
+}
+
+
+// utility functions
+function getDir(options) {
+    return options.directory || ".";
 }

@@ -36,11 +36,12 @@ exports.init = function init(root, cb) {
 
 exports.update = function update(root) {
     var finder = findit(root);
+    var data = load(root);
     finder.on('file', function (file, stat) {
-        add(file);
+        add(data, file);
     });
     finder.on('end', function () {
-        save();
+        save(root, data);
     });
 };
 
@@ -53,9 +54,21 @@ exports.tag = function tag(root, f, tags) {
 
 exports.tags = function tags(root, f) {
     var data = load(root);
-    var tags = data.files[f].tags || [];
-    return tags;
+    return data.files[f].tags || [];
 }
+
+exports.random = function random(root, tags) {
+    var data = load(root);
+    var matchingFiles = [];
+    _.each(data.files, function (f, name) {
+        if (f.tags) {
+            if (_.intersection(f.tags, tags).length === tags.length) {
+                matchingFiles.push(name);
+            }
+        }
+    })
+    return _.sample(matchingFiles);
+};
 
 // Private functions
 
@@ -70,6 +83,7 @@ function save(root, data) {
 }
 
 function add(data, f, tags) {
+    tags = tags || [];
     data.files = data.files || {};
     data.files[f] = data.files[f] || {};
     var previousTags = data.files[f].tags || []
