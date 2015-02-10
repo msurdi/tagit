@@ -37,7 +37,7 @@ exports.init = function init(root, cb) {
 exports.update = function update(root) {
     var finder = findit(root);
     var data = load(root);
-    finder.on('file', function (file, stat) {
+    finder.on('file', function (file) {
         add(data, file);
     });
     finder.on('end', function () {
@@ -48,26 +48,30 @@ exports.update = function update(root) {
 
 exports.tag = function tag(root, f, tags) {
     var data = load(root);
-    data = add(data, f, tags)
+    data = add(data, f, tags);
     save(root, data);
 };
 
 exports.tags = function tags(root, f) {
     var data = load(root);
     return data.files[f].tags || [];
-}
+};
 
-exports.random = function random(root, tags) {
+exports.tagged = function tagged(root, tags) {
     var data = load(root);
     var matchingFiles = [];
-    _.each(data.files, function (f, name) {
+    _.each(data.files, function (f) {
         if (f.tags) {
             if (_.intersection(f.tags, tags).length === tags.length) {
-                matchingFiles.push(name);
+                matchingFiles.push(f);
             }
         }
-    })
-    return _.sample(matchingFiles);
+    });
+    return matchingFiles;
+};
+
+exports.random = function random(root, tags) {
+    return _.sample(exports.tagged(root, tags));
 };
 
 // Private functions
@@ -86,9 +90,9 @@ function add(data, f, tags) {
     tags = tags || [];
     data.files = data.files || {};
     data.files[f] = data.files[f] || {};
-    var previousTags = data.files[f].tags || []
+    var previousTags = data.files[f].tags || [];
     var allTags = _.uniq(tags.concat(previousTags));
-    data.files[f] = {'tags': allTags, 'added': Date.now()};
+    data.files[f] = {'name': f, 'tags': allTags, 'added': Date.now()};
     return data;
 }
 

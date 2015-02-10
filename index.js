@@ -8,12 +8,12 @@ var tagit = require('./tagit');
 
 program
     .version('0.0.1')
-    .option('-d --directory <directory>', 'Taggit work directory')
+    .option('-d --directory <directory>', 'Taggit work directory');
 
 program
     .command('init [dir]')
     .description('Initialize directory for file tagging')
-    .action(function (dir, options) {
+    .action(function (dir) {
         dir = dir || '.';
         tagit.init(dir, function (err, initialized) {
             if (!err) {
@@ -59,7 +59,16 @@ program
     .command('tagged <tag> [tags...]')
     .description('List files matching all given tags')
     .action(function (f, tag, tags, options) {
-
+        var allTags = otherTags || [];
+        allTags.push(tag);
+        var files = tagit.tagged(getDir(options.parent), allTags);
+        if (files) {
+            _.each(files, function (f) {
+                console.log(f.name)
+            })
+        } else {
+            console.log("There are no files matching tags %s", allTags);
+        }
     });
 
 program
@@ -79,7 +88,12 @@ program
     .command('random [tags...]')
     .description('Choose a random file matching the specified tags.')
     .action(function (tags, options) {
-        console.log(tagit.random(getDir(options.parent), tags));
+        var f = tagit.random(getDir(options.parent), tags);
+        if (f) {
+            console.log(f.name);
+        } else {
+            console.log("No file found matching tags %s", tags)
+        }
     });
 
 program
