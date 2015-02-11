@@ -37,12 +37,19 @@ exports.init = function init(root, cb) {
 exports.update = function update(root) {
     var finder = findit(root);
     var data = load(root);
-    finder.on('file', function (file) {
-        add(data, file);
+    finder.on('file', function (f) {
+        if (f.indexOf('.') !== 0) {
+            add(data, f);
+        }
     });
+
     finder.on('end', function () {
         save(root, data);
     });
+
+    finder.on('error', function (err) {
+        console.warn("processing %s: %s", err.path, err.code);
+    })
 };
 
 
