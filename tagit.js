@@ -52,6 +52,14 @@ exports.update = function update(root) {
     })
 };
 
+exports.remove = function remove(root, f) {
+    var data = load(root);
+    if (data.files && data.files[f]) {
+        delete data.files[f];
+        save(root, data);
+    }
+};
+
 
 exports.tag = function tag(root, f, tags) {
     var data = load(root);
@@ -70,11 +78,15 @@ exports.untag = function untag(root, f, tags) {
         data.files[f].tags = newTags;
         save(root, data);
     }
-}
+};
 
 exports.tags = function tags(root, f) {
     var data = load(root);
-    return data.files[f].tags || [];
+    var tags = [];
+    if (data.files && data.files[f] && data.files[f].tags) {
+        tags = data.files[f].tags;
+    }
+    return tags;
 };
 
 exports.tagged = function tagged(root, tags) {

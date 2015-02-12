@@ -84,6 +84,7 @@ program
     .command('remove <file>')
     .description('remove file from index')
     .action(function (f, options) {
+        tagit.remove(getDir(options.parent), f);
     });
 
 program
