@@ -52,6 +52,14 @@ exports.update = function update(root) {
     })
 };
 
+exports.autotag = function autotag(root) {
+    var data = load(root);
+    _.each(data.files, function (f) {
+        data.files[f.name].tags = mergeTags(data.files[f.name].tags || [], extractTags(f.name));
+    });
+    save(root, data);
+};
+
 exports.remove = function remove(root, f) {
     var data = load(root);
     if (data.files && data.files[f]) {
@@ -123,8 +131,24 @@ function add(data, f, tags) {
     data.files = data.files || {};
     data.files[f] = data.files[f] || {};
     var previousTags = data.files[f].tags || [];
-    var allTags = _.uniq(tags.concat(previousTags));
+    var allTags = mergeTags(previousTags, tags);
     data.files[f] = {'name': f, 'tags': allTags, 'added': Date.now()};
     return data;
 }
 
+function mergeTags(oldTags, newTags) {
+    oldTags = oldTags || [];
+    newTags = newTags || [];
+    return _.uniq(oldTags.concat(newTags))
+}
+
+function extractTags(f) {
+    var tags = [];
+    if (f) {
+        tags = f.split(/[^A-Za-z]/);
+        tags = _.filter(tags, function (tag) {
+            return tag.length > 2;
+        });
+    }
+    return tags;
+}

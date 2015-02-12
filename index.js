@@ -37,6 +37,13 @@ program
     });
 
 program
+    .command('autotag')
+    .description('Automatically tag all files extracting tags from their filenames')
+    .action(function (options) {
+        tagit.autotag(getDir(options));
+    });
+
+program
     .command('tag <file> <tag> [tags...]')
     .description("Tag a file with the given tags")
     .action(function (f, tag, otherTags, options) {
