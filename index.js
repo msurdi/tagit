@@ -59,7 +59,7 @@ program
     .command('tagged <tag> [tags...]')
     .description('List files matching all given tags')
     .action(function (f, tag, tags, options) {
-        var allTags = otherTags || [];
+        var allTags = tags || [];
         allTags.push(tag);
         var files = tagit.tagged(getDir(options.parent), allTags);
         if (files) {
@@ -75,7 +75,9 @@ program
     .command('untag <file> <tag> [tags...]')
     .description('Remove all given tags from file')
     .action(function (f, tag, tags, options) {
-
+        var allTags = tags || [];
+        allTags.push(tag);
+        tagit.untag(getDir(options.parent), f, allTags);
     });
 
 program

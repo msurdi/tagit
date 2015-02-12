@@ -59,6 +59,19 @@ exports.tag = function tag(root, f, tags) {
     save(root, data);
 };
 
+exports.untag = function untag(root, f, tags) {
+    var data = load(root);
+    if (data.files && data.files[f] && data.files[f].tags) {
+        var oldTags = data.files[f].taas || [];
+        var newTags = oldTags;
+        if (oldTags) {
+            newTags = _.without(oldTags, tags);
+        }
+        data.files[f].tags = newTags;
+        save(root, data);
+    }
+}
+
 exports.tags = function tags(root, f) {
     var data = load(root);
     return data.files[f].tags || [];
