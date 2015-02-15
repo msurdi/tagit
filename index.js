@@ -6,6 +6,17 @@ var program = require('commander');
 var _ = require('underscore');
 var tagit = require('./tagit');
 
+
+process.on('uncaughtException', function (err) {
+    if (err instanceof tagit.NoDataError) {
+        console.log(err.message);
+    } else {
+        console.log('Unhandled error: %s', err.message);
+    }
+    process.exit(1);
+});
+
+
 program
     .version('0.0.1')
     .option('-d --directory <directory>', 'Taggit work directory');
@@ -127,7 +138,6 @@ program.parse(process.argv);
 if (program.args.length === 0) {
     program.help();
 }
-
 
 // utility functions
 function getDir(options) {

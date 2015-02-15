@@ -122,11 +122,35 @@ exports.random = function random(root, tags) {
     return _.sample(exports.tagged(root, tags));
 };
 
+function NoDataError(message) {
+    this.name = "NoDataError";
+    this.message = (message || "There is no .tagit directory in this directory or any of its parents."
+    + "Did you forget to run `tagit init`?");
+};
+NoDataError.prototype = Error.prototype;
+
+exports.NoDataError = NoDataError;
+
 // Private functions
 
 function load(root) {
-    var dataPath = path.join(root, TAGIT_DIR, TAGIT_FILE);
-    return JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+    var absRoot = path.resolve(root);
+    var dataPath = path.join(absRoot, TAGIT_DIR, TAGIT_FILE);
+    var data = null;
+    try {
+        data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+    } catch (e) {
+        if (e.code === 'ENOENT') {
+            if (absRoot !== '/') {
+                return load(path.join(absRoot, '..'));
+            } else {
+                throw new NoDataError(); // Throw own exception
+            }
+        } else {
+            throw e;
+        }
+    }
+    return data
 }
 
 function save(root, data) {
