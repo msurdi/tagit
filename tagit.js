@@ -33,7 +33,6 @@ exports.init = function init(root, cb) {
     }
 };
 
-
 exports.update = function update(root) {
     var finder = findit(root);
     var data = load(root);
@@ -139,7 +138,11 @@ function add(data, f, tags) {
 function mergeTags(oldTags, newTags) {
     oldTags = oldTags || [];
     newTags = newTags || [];
-    return _.uniq(oldTags.concat(newTags))
+    var tags = oldTags.concat(newTags)
+    tags.map(function (tag) {
+        return tag.toLowerCase()
+    });
+    return _.uniq(tags)
 }
 
 function extractTags(f) {
