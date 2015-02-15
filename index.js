@@ -54,10 +54,17 @@ program
     });
 
 program
-    .command('tags <file>')
-    .description('List current tags for the given file')
+    .command('tags [file]')
+    .description('List tags for file. If no file is given list all available tags')
     .action(function (f, options) {
-        console.log(tagit.tags(getDir(options), f));
+        if (f) {
+            console.log(tagit.tags(getDir(options), f));
+        }
+        else {
+            _.each(tagit.allTags(getDir(options)), function (tag) {
+                console.log(tag);
+            });
+        }
     }
 );
 
@@ -65,16 +72,17 @@ program
 program
     .command('tagged <tag> [tags...]')
     .description('List files matching all given tags')
-    .action(function (f, tag, tags, options) {
-        var allTags = tags || [];
-        allTags.push(tag);
-        var files = tagit.tagged(getDir(options.parent), allTags);
+    .action(function (tag, tags, options) {
+        tags = tags || [];
+        debugger;
+        tags.push(tag);
+        var files = tagit.tagged(getDir(options.parent), tags);
         if (files) {
             _.each(files, function (f) {
                 console.log(f.name)
             })
         } else {
-            console.log("There are no files matching tags %s", allTags);
+            console.log("There are no files matching tags %s", tags);
         }
     });
 
