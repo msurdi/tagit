@@ -96,6 +96,15 @@ exports.tags = function tags(root, f) {
     return tags;
 };
 
+exports.allTags = function allTags(root) {
+    var data = load(root);
+    var tags = [];
+    _.each(data.files, function (f) {
+        tags = tags.concat(f.tags);
+    });
+    return _.uniq(tags).sort();
+}
+
 exports.tagged = function tagged(root, tags) {
     var data = load(root);
     var matchingFiles = [];
@@ -139,7 +148,7 @@ function mergeTags(oldTags, newTags) {
     oldTags = oldTags || [];
     newTags = newTags || [];
     var tags = oldTags.concat(newTags)
-    tags.map(function (tag) {
+    tags = tags.map(function (tag) {
         return tag.toLowerCase()
     });
     return _.uniq(tags)
