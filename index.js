@@ -11,7 +11,8 @@ process.on('uncaughtException', function (err) {
     if (err instanceof tagit.NoDataError) {
         console.log(err.message);
     } else {
-        console.log('Unhandled error: %s', err.message);
+        console.log('Unhandled error: %s', err);
+        console.log(err.stack);
     }
     process.exit(1);
 });
@@ -85,7 +86,6 @@ program
     .description('List files matching all given tags')
     .action(function (tag, tags, options) {
         tags = tags || [];
-        debugger;
         tags.push(tag);
         var files = tagit.tagged(getDir(options.parent), tags);
         if (files) {

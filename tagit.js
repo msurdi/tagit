@@ -122,37 +122,33 @@ exports.random = function random(root, tags) {
     return _.sample(exports.tagged(root, tags));
 };
 
-function NoDataError(message) {
+var NoDataError = exports.NoDataError = function NoDataError(message) {
     this.name = "NoDataError";
     this.message = (message || "There is no .tagit directory in this directory or any of its parents."
     + "Did you forget to run `tagit init`?");
 };
-NoDataError.prototype = Error.prototype;
+NoDataError.prototype = new Error();
 
-exports.NoDataError = NoDataError;
 
 // Private functions
 
-function load(root) {
-    var absRoot = path.resolve(root);
-    var dataPath = path.join(absRoot, TAGIT_DIR, TAGIT_FILE);
-    var data = null;
-    try {
-        data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-    } catch (e) {
-        if (e.code === 'ENOENT') {
-            if (absRoot !== '/') {
-                return load(path.join(absRoot, '..'));
-            } else {
-                throw new NoDataError(); // Throw own exception
-            }
-        } else {
-            throw e;
-        }
+function findDataDir(root) {
+    var absRoot = path.resolve(path.join(root, TAGIT_DIR));
+    var stat = fs.statSync(absRoot);
+    if (stat.isDirectory(stat)) {
+        return root;
+    } else if (path !== '/') {
+        return findDataDir(path.join(root, '..'));
+    } else {
+        throw new NoDataError();
     }
-    return data
 }
 
+function load(root) {
+    var tagitDir = findDataDir(root);
+    var dataPath = path.join(tagitDir, TAGIT_DIR, TAGIT_FILE);
+    return JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+}
 function save(root, data) {
     var dataPath = path.join(root, TAGIT_DIR, TAGIT_FILE);
     fs.writeFileSync(dataPath, JSON.stringify(data), 'utf8');
