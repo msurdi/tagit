@@ -10,18 +10,17 @@ var TAGIT_DIR = '.tagit';
 var TAGIT_FILE = 'data.json';
 
 
-/**
- * Initializes the working directory
- *
- * @param root
- * @param  {Function} cb
- */
-exports.init = function init(root, cb) {
-    var dir = path.join(root, TAGIT_DIR);
+var Tagit = exports.Tagit = function Tagit(workDir) {
+    this.workDir = workDir || '.';
+};
+
+Tagit.prototype.init = function init(cb) {
+    var self = this;
+    var dir = path.join(self.workDir, TAGIT_DIR);
     if (!fs.existsSync(dir)) {
         try {
             fs.mkdirSync(dir);
-            save(root, {});
+            save(self.workDir, {});
             cb(undefined, true);
         }
         catch (ex) {
@@ -33,9 +32,10 @@ exports.init = function init(root, cb) {
     }
 };
 
-exports.update = function update(root) {
-    var finder = findit(root);
-    var data = load(root);
+Tagit.prototype.update = function update() {
+    var self = this;
+    var finder = findit(self.workDir);
+    var data = load(self.workDir);
     finder.on('file', function (f) {
         if (f.indexOf('.') !== 0) {
             add(data, f);
@@ -43,7 +43,7 @@ exports.update = function update(root) {
     });
 
     finder.on('end', function () {
-        save(root, data);
+        save(self.workDir, data);
     });
 
     finder.on('error', function (err) {
@@ -51,31 +51,35 @@ exports.update = function update(root) {
     })
 };
 
-exports.autotag = function autotag(root) {
-    var data = load(root);
-    _.each(data.files, function (f) {
+Tagit.prototype.autotag = function autotag() {
+    var self = this;
+    var data = load(self.workDir);
+    data.files.forEach(function (f) {
         data.files[f.name].tags = mergeTags(data.files[f.name].tags || [], extractTags(f.name));
     });
-    save(root, data);
+    save(self.workDir, data);
 };
 
-exports.remove = function remove(root, f) {
-    var data = load(root);
+Tagit.prototype.remove = function remove(f) {
+    var self = this;
+    var data = load(self.workDir);
     if (data.files && data.files[f]) {
         delete data.files[f];
-        save(root, data);
+        save(self.workDir, data);
     }
 };
 
 
-exports.tag = function tag(root, f, tags) {
-    var data = load(root);
+Tagit.prototype.tag = function tag(f, tags) {
+    var self = this;
+    var data = load(self.workDir);
     data = add(data, f, tags);
-    save(root, data);
+    save(self, data);
 };
 
-exports.untag = function untag(root, f, tags) {
-    var data = load(root);
+Tagit.prototype.untag = function untag(f, tags) {
+    var self = this;
+    var data = load(self.workDir);
     if (data.files && data.files[f] && data.files[f].tags) {
         var oldTags = data.files[f].taas || [];
         var newTags = oldTags;
@@ -83,12 +87,13 @@ exports.untag = function untag(root, f, tags) {
             newTags = _.without(oldTags, tags);
         }
         data.files[f].tags = newTags;
-        save(root, data);
+        save(self.workDir, data);
     }
 };
 
-exports.tags = function tags(root, f) {
-    var data = load(root);
+Tagit.prototype.tags = function tags(f) {
+    var self = this;
+    var data = load(self.workDir);
     var tags = [];
     if (data.files && data.files[f] && data.files[f].tags) {
         tags = data.files[f].tags;
@@ -96,18 +101,23 @@ exports.tags = function tags(root, f) {
     return tags;
 };
 
-exports.allTags = function allTags(root) {
-    var data = load(root);
+Tagit.prototype.allTags = function allTags() {
+    var self = this;
+    var data = load(self.workDir);
     var tags = [];
     _.each(data.files, function (f) {
         tags = tags.concat(f.tags);
     });
     return _.uniq(tags).sort();
-}
+};
 
-exports.tagged = function tagged(root, tags) {
-    var data = load(root);
+Tagit.prototype.tagged = function tagged(tags) {
+    var self = this;
+    var data = load(self.workDir);
     var matchingFiles = [];
+    if (!tags) {
+        return _.keys(data.files);
+    }
     _.each(data.files, function (f) {
         if (f.tags) {
             if (_.intersection(f.tags, tags).length === tags.length) {
@@ -118,8 +128,9 @@ exports.tagged = function tagged(root, tags) {
     return matchingFiles;
 };
 
-exports.random = function random(root, tags) {
-    return _.sample(exports.tagged(root, tags));
+Tagit.prototype.random = function random(tags) {
+    var self = this;
+    return _.sample(self.tagged(tags));
 };
 
 var NoDataError = exports.NoDataError = function NoDataError(message) {
@@ -132,25 +143,25 @@ NoDataError.prototype = new Error();
 
 // Private functions
 
-function findDataDir(root) {
-    var absRoot = path.resolve(path.join(root, TAGIT_DIR));
-    var stat = fs.statSync(absRoot);
+function findDataDir(workDir) {
+    var absworkDir = path.resolve(path.join(workDir, TAGIT_DIR));
+    var stat = fs.statSync(absworkDir);
     if (stat.isDirectory(stat)) {
-        return root;
+        return workDir;
     } else if (path !== '/') {
-        return findDataDir(path.join(root, '..'));
+        return findDataDir(path.join(workDir, '..'));
     } else {
         throw new NoDataError();
     }
 }
 
-function load(root) {
-    var tagitDir = findDataDir(root);
+function load(workDir) {
+    var tagitDir = findDataDir(workDir);
     var dataPath = path.join(tagitDir, TAGIT_DIR, TAGIT_FILE);
     return JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 }
-function save(root, data) {
-    var dataPath = path.join(root, TAGIT_DIR, TAGIT_FILE);
+function save(workDir, data) {
+    var dataPath = path.join(workDir, TAGIT_DIR, TAGIT_FILE);
     fs.writeFileSync(dataPath, JSON.stringify(data), 'utf8');
 }
 

@@ -3,10 +3,13 @@
 "use strict";
 
 var program = require('commander');
-var _ = require('underscore');
 var tagit = require('./tagit');
+var workDir = '.';
 
 
+/**
+ *  Global error handler, last step before crashing.
+ */
 process.on('uncaughtException', function (err) {
     if (err instanceof tagit.NoDataError) {
         console.log(err.message);
@@ -18,21 +21,25 @@ process.on('uncaughtException', function (err) {
 });
 
 
+/**
+ *  Main CLI parameters
+ */
 program
     .version('0.0.1')
-    .option('-d --directory <directory>', 'Taggit work directory');
+    .option('-d --directory <directory>', 'Taggit work directory', function (val) {
+        workDir = getDir(val);
+    });
 
 program
-    .command('init [dir]')
+    .command('init')
     .description('Initialize directory for file tagging')
     .action(function (dir) {
-        dir = dir || '.';
-        tagit.init(dir, function (err, initialized) {
+        repo().init(function (err, initialized) {
             if (!err) {
                 if (initialized) {
-                    console.log("Initialized %s", dir);
+                    console.log("Initialized %s", workDir);
                 } else {
-                    console.log("%s is already initialized", dir);
+                    console.log("%s is already initialized", workDir);
                 }
             } else {
                 console.error(err.message);
@@ -44,15 +51,15 @@ program
 program
     .command('update')
     .description('Update the index by adding new files and removing missing ones')
-    .action(function (options) {
-        tagit.update(getDir(options));
+    .action(function () {
+        repo().update();
     });
 
 program
     .command('autotag')
     .description('Automatically tag all files extracting tags from their filenames')
     .action(function (options) {
-        tagit.autotag(getDir(options));
+        repo().autotag();
     });
 
 program
@@ -62,7 +69,7 @@ program
         var allTags = otherTags || [];
         allTags.push(tag);
         console.log('Tagging file %s with tags %s', f, allTags.toString());
-        tagit.tag(getDir(options), f, allTags);
+        repo().tag(f, allTags);
     });
 
 program
@@ -70,10 +77,10 @@ program
     .description('List tags for file. If no file is given list all available tags')
     .action(function (f, options) {
         if (f) {
-            console.log(tagit.tags(getDir(options), f));
+            console.log(repo().tags(f));
         }
         else {
-            _.each(tagit.allTags(getDir(options)), function (tag) {
+            repo().allTags().forEach(function (tag) {
                 console.log(tag);
             });
         }
@@ -84,14 +91,14 @@ program
 program
     .command('tagged <tag> [tags...]')
     .description('List files matching all given tags')
-    .action(function (tag, tags, options) {
+    .action(function (tag, tags) {
         tags = tags || [];
         tags.push(tag);
-        var files = tagit.tagged(getDir(options.parent), tags);
+        var files = repo().tagged(tags);
         if (files) {
-            _.each(files, function (f) {
-                console.log(f.name)
-            })
+            files.forEach(function (f) {
+                console.log(f.name);
+            });
         } else {
             console.log("There are no files matching tags %s", tags);
         }
@@ -100,24 +107,24 @@ program
 program
     .command('untag <file> <tag> [tags...]')
     .description('Remove all given tags from file')
-    .action(function (f, tag, tags, options) {
+    .action(function (f, tag, tags) {
         var allTags = tags || [];
         allTags.push(tag);
-        tagit.untag(getDir(options.parent), f, allTags);
+        repo().untag(f, allTags);
     });
 
 program
     .command('remove <file>')
     .description('remove file from index')
-    .action(function (f, options) {
-        tagit.remove(getDir(options.parent), f);
+    .action(function (f) {
+        repo().remove(f);
     });
 
 program
     .command('random [tags...]')
     .description('Choose a random file matching the specified tags.')
     .action(function (tags, options) {
-        var f = tagit.random(getDir(options.parent), tags);
+        var f = repo().random(tags);
         if (f) {
             console.log(f.name);
         } else {
@@ -140,6 +147,17 @@ if (program.args.length === 0) {
 }
 
 // utility functions
+
+/**
+ * Create a Tagit instance for the current work directory;
+ *
+ * @returns {tagit.Tagit}
+ */
+function repo() {
+    return new tagit.Tagit(workDir);
+}
+
+
 function getDir(options) {
     return options.directory || ".";
 }
