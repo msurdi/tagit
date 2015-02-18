@@ -54,7 +54,7 @@ Tagit.prototype.update = function update() {
 Tagit.prototype.autotag = function autotag() {
     var self = this;
     var data = load(self.workDir);
-    data.files.forEach(function (f) {
+    _.each(data.files, function (f) {
         data.files[f.name].tags = mergeTags(data.files[f.name].tags || [], extractTags(f.name));
     });
     save(self.workDir, data);
@@ -74,7 +74,7 @@ Tagit.prototype.tag = function tag(f, tags) {
     var self = this;
     var data = load(self.workDir);
     data = add(data, f, tags);
-    save(self, data);
+    save(self.workDir, data);
 };
 
 Tagit.prototype.untag = function untag(f, tags) {
