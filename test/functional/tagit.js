@@ -27,7 +27,7 @@ function run(args, cb) {
     });
 }
 
-describe("Before initialization", function () {
+describe("when not yet initialized", function () {
     var workDir;
     var cleanupWorkDir;
 
@@ -62,7 +62,7 @@ describe("Before initialization", function () {
         })
     });
 
-    describe("After initialized directory", function () {
+    describe("when initialized", function () {
         beforeEach(function (done) {
             ncp(path.join(__dirname, '../fixtures'), workDir, function (err) {
                 if (err) throw err;
@@ -93,24 +93,110 @@ describe("Before initialization", function () {
             });
         });
 
-        it('should index files', function (done) {
-            run(['tag', 'test_file_1.txt', 'sometag'], function (err, code) {
-                assert.equal(code, 0);
+        it('should fail to index inexistent file', function (done) {
+            run(['tag', 'inexistent_file.txt', 'othertag'], function (err, code) {
+                assert.notEqual(code, 0);
                 done();
             });
         });
 
-        it('should fail to index inexistent file', function (done) {
-            run(['tag', 'inexistent_file.txt', 'othertag'], function (err, code) {
-                assert.notEqual(code, 0);
+
+        describe('when there are files manually tagged', function () {
+            beforeEach(function (done) {
+                run(['tag', 'test_file_1.txt', 'sometag', 'sometag2'], function (err) {
+                    run(['tag', 'test2_file_2.txt', 'sometag2'], done);
+                });
+            });
+
+            it('should have one file with tag sometag', function (done) {
+                run(['tagged', 'sometag'], function (err, code, stdout) {
+                    assert.equal(code, 0);
+                    assert.include(stdout, 'test_file_1.txt');
+                    done();
+                });
+            });
+
+            it('should have two files with tag sometag2', function (done) {
+                run(['tagged', 'sometag2'], function (err, code, stdout) {
+                    assert.equal(code, 0);
+                    assert.include(stdout, 'test_file_1.txt');
+                    assert.include(stdout, 'test2_file_2.txt');
+                    done();
+                });
+            });
+
+            describe('when file is untagged', function () {
+                beforeEach(function (done) {
+                    run(['untag', 'test_file_1.txt', 'sometag'], done);
+                });
+
+                it('shouldn\'t be any file', function (done) {
+                    run(['tagged', 'test_file_1.txt', 'sometag'], function (err, code, stdout) {
+                        assert.equal(code, 0);
+                        assert.equal(stdout, '');
+                        done();
+                    });
+                });
+            });
+
+            describe('when file is removed', function () {
+                beforeEach(function (done) {
+                    run(['remove', 'test_file_1.txt'], done);
+                    it('shouldn\'t be any file', function (done) {
+                        run(['tagged', 'test_file_1.txt', 'sometag'], function (err, code, stdout) {
+                            assert.equal(code, 0);
+                            assert.equal(stdout, '');
+                            done();
+                        });
+                    });
+                });
+            });
+
+            describe('when there are files autotagged', function () {
+                beforeEach(function (done) {
+                    run(['autotag'], done);
+                });
+
+                it('should have one file with tag test', function (done) {
+                    run(['tagged', 'sometag'], function (err, code, stdout) {
+                        assert.equal(code, 0);
+                        assert.include(stdout, 'test_file_1.txt');
+                        done();
+                    });
+                });
+
+                it('should have two files with tag file', function (done) {
+                    run(['tagged', 'sometag2'], function (err, code, stdout) {
+                        assert.equal(code, 0);
+                        assert.include(stdout, 'test_file_1.txt');
+                        assert.include(stdout, 'test2_file_2.txt');
+                        done();
+                    });
+                });
+
+                it('should return a random file with all tags', function (done) {
+                    run(['random'], function (err, code, stdout) {
+                        if (stdout.indexOf('test_file_1.txt') > -1) {
+                            assert.notInclude(stdout, 'test2_file_2.txt');
+                        }
+                        if (stdout.indexOf('test2_file_2.txt') > -1) {
+                            assert.notInclude('test_file_1.txt');
+                        }
+                        assert.equal(code, 0);
+                        done();
+                    });
+                });
+
+                it('should return a random file with tag test', function (done) {
+                    run(['random', 'test'], function (err, code, stdout) {
+                        assert.notInclude(stdout, 'test2_file_2.txt');
+                        assert.include(stdout, 'test_file_1.txt');
+                        assert.equal(code, 0);
+                        done();
+                    });
+                });
+
             });
         });
-
-
-        describe('After there are files tagged', function () {
-
-
-        });
-
     });
 });
