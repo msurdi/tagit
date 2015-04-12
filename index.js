@@ -3,7 +3,7 @@
 "use strict";
 
 var program = require('commander');
-var tagit = require('./tagit');
+var tagit = require('./lib/tagit');
 var workDir = '.';
 
 
@@ -26,20 +26,18 @@ process.on('uncaughtException', function (err) {
  */
 program
     .version('0.0.1')
-    .option('-d --directory <directory>', 'Taggit work directory', function (val) {
-        workDir = getDir(val);
-    });
+    .option('-d --directory <directory>', 'Taggit work directory');
 
 program
     .command('init')
     .description('Initialize directory for file tagging')
     .action(function (dir) {
-        repo().init(function (err, initialized) {
+        repo(dir).init(function (err, initialized) {
             if (!err) {
                 if (initialized) {
-                    console.log("Initialized %s", workDir);
+                    console.log("Initialized %s", dir);
                 } else {
-                    console.log("%s is already initialized", workDir);
+                    console.log("%s is already initialized", dir);
                 }
             } else {
                 console.error(err.message);
@@ -151,13 +149,11 @@ if (program.args.length === 0) {
 /**
  * Create a Tagit instance for the current work directory;
  *
- * @returns {tagit.Tagit}
+ * @returns {exports.Tagit}
  */
-function repo() {
-    return new tagit.Tagit(workDir);
-}
-
-
-function getDir(options) {
-    return options.directory || ".";
+function repo(dir) {
+    if (!dir) {
+        dir = !!program.directory ? program.directory : ".";
+    }
+    return new tagit.Tagit(dir);
 }

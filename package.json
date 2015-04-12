@@ -6,6 +6,9 @@
   "bin": {
     "tagit": "./index.js"
   },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --recursive"
+  },
   "keywords": [
     "file",
     "tag",
@@ -17,5 +20,10 @@
     "commander": "^2.6.0",
     "findit": "^2.0.0",
     "underscore": "^1.7.0"
+  },
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*",
+    "tmp": "0.0.25"
   }
 }
