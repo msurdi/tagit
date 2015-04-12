@@ -27,7 +27,7 @@ function run(args, cb) {
 }
 
 
-describe("Tagit before initialization", function () {
+describe("Before initialization", function () {
     var workDir;
     var cleanupWorkDir;
 
@@ -61,18 +61,38 @@ describe("Tagit before initialization", function () {
         })
     });
 
-    describe("Tagit after initialized directory", function () {
+    describe("After initialized directory", function () {
         beforeEach(function (done) {
             run(['init', workDir], function (err, code, stdout) {
                 done();
             });
         });
 
-        it('shoult fail to init already initialized directories', function (done) {
+        it('should fail to init already initialized directories', function (done) {
             run(['init', workDir], function (err, code, stdout) {
                 assert.notEqual(code, 0);
                 done();
             });
         });
+
+        it('shouldn\'t list any tag', function (done) {
+            run(['tags'], function (err, code, stdout) {
+                assert.equal(stdout, '');
+                assert.equal(code, 0);
+                done();
+            });
+        });
+
+        it('shouldn\'t list any file for a nonexistent tag', function (done) {
+            run(['tagged', 'nonexistent'], function (err, code, stdout) {
+                assert.equal(stdout, '');
+                assert.equal(code, 0);
+                done();
+            });
+        });
+
+        
+
+
     });
 });
