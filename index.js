@@ -65,11 +65,17 @@ program
 program
     .command('tag <file> <tag> [tags...]')
     .description("Tag a file with the given tags")
-    .action(function (f, tag, otherTags, options) {
+    .action(function (f, tag, otherTags) {
         var allTags = otherTags || [];
         allTags.push(tag);
-        console.log('Tagging file %s with tags %s', f, allTags.toString());
-        repo().tag(f, allTags);
+        repo().tag(f, allTags, function (err, tagged) {
+            if (err && err.code === 'ENOENT') {
+                console.log('Can\'t tag inexistent file ' + f);
+                process.exit(1);
+            } else {
+                console.log('Tagged file %s with tags %s', f, allTags.toString());
+            }
+        });
     });
 
 program
