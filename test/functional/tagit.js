@@ -27,19 +27,20 @@ function run(args, cb) {
 }
 
 
-describe("Tagit", function () {
+describe("Tagit before initialization", function () {
     var workDir;
     var cleanupWorkDir;
 
-    before(function () {
+    beforeEach(function (done) {
         tmp.dir({unsafeCleanup: true}, function (err, path, cleanupCallback) {
             if (err) throw err;
             workDir = path;
             cleanupWorkDir = cleanupCallback;
+            done();
         });
     });
 
-    after(function () {
+    afterEach(function () {
         cleanupWorkDir();
     });
 
@@ -60,7 +61,18 @@ describe("Tagit", function () {
         })
     });
 
+    describe("Tagit after initialized directory", function () {
+        beforeEach(function (done) {
+            run(['init', workDir], function (err, code, stdout) {
+                done();
+            });
+        });
 
-
-
+        it('shoult fail to init already initialized directories', function (done) {
+            run(['init', workDir], function (err, code, stdout) {
+                assert.notEqual(code, 0);
+                done();
+            });
+        });
+    });
 });
