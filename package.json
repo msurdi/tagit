@@ -22,7 +22,8 @@
     "underscore": "^1.7.0"
   },
   "devDependencies": {
-    "chai": "*",
+    "chai": "<2.2",
+    "chai-fs": "git://github.com/carrot/chai-fs.git#version-bump",
     "mocha": "*",
     "tmp": "0.0.25"
   }
