@@ -38,9 +38,11 @@ program
                     console.log("Initialized %s", dir);
                 } else {
                     console.log("%s is already initialized", dir);
+                    process.exit(1);
                 }
             } else {
                 console.error(err.message);
+                process.exit(1);
             }
         });
     });
