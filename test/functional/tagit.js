@@ -2,9 +2,10 @@ var chai = require('chai');
 var spawn = require('child_process').spawn;
 var tmp = require('tmp');
 var path = require('path');
+var ncp = require('ncp').ncp;
 
 var NODE = 'node';
-var INDEX = 'index.js';
+var INDEX = path.join(__dirname, '../../index.js');
 
 chai.use(require('chai-fs'));
 
@@ -26,7 +27,6 @@ function run(args, cb) {
     });
 }
 
-
 describe("Before initialization", function () {
     var workDir;
     var cleanupWorkDir;
@@ -36,6 +36,7 @@ describe("Before initialization", function () {
             if (err) throw err;
             workDir = path;
             cleanupWorkDir = cleanupCallback;
+            process.chdir(workDir);
             done();
         });
     });
@@ -46,9 +47,9 @@ describe("Before initialization", function () {
 
     it('should print help when no args', function (done) {
         run([], function (err, code, stdout) {
-            assert.include(stdout, "Usage");
-            //expect(stdout).to.have.string("Commands");
-            //expect(stdout).to.have.string("Options");
+            assert.include(stdout, 'Usage');
+            assert.include(stdout, 'Commands')
+            assert.include(stdout, 'Options')
             done();
         });
     });
@@ -63,8 +64,9 @@ describe("Before initialization", function () {
 
     describe("After initialized directory", function () {
         beforeEach(function (done) {
-            run(['init', workDir], function (err, code, stdout) {
-                done();
+            ncp(path.join(__dirname, '../fixtures'), workDir, function (err) {
+                if (err) throw err;
+                run(['init', workDir], done);
             });
         });
 
@@ -91,8 +93,24 @@ describe("Before initialization", function () {
             });
         });
 
-        
+        it('should index files', function (done) {
+            run(['tag', 'test_file_1.txt', 'sometag'], function (err, code) {
+                assert.equal(code, 0);
+                done();
+            });
+        });
 
+        it('should fail to index inexistent file', function (done) {
+            run(['tag', 'inexistent_file.txt', 'othertag'], function (err, code) {
+                assert.notEqual(code, 0);
+            });
+        });
+
+
+        describe('After there are files tagged', function () {
+
+
+        });
 
     });
 });
