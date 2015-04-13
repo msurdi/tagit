@@ -151,52 +151,57 @@ describe("when not yet initialized", function () {
                     });
                 });
             });
-
-            describe('when there are files autotagged', function () {
-                beforeEach(function (done) {
+        });
+        describe('when there are files autotagged', function () {
+            beforeEach(function (done) {
+                run(['update'], function (err) {
+                    if (err) throw err;
                     run(['autotag'], done);
                 });
-
-                it('should have one file with tag test', function (done) {
-                    run(['tagged', 'sometag'], function (err, code, stdout) {
-                        assert.equal(code, 0);
-                        assert.include(stdout, 'test_file_1.txt');
-                        done();
-                    });
-                });
-
-                it('should have two files with tag file', function (done) {
-                    run(['tagged', 'sometag2'], function (err, code, stdout) {
-                        assert.equal(code, 0);
-                        assert.include(stdout, 'test_file_1.txt');
-                        assert.include(stdout, 'test2_file_2.txt');
-                        done();
-                    });
-                });
-
-                it('should return a random file with all tags', function (done) {
-                    run(['random'], function (err, code, stdout) {
-                        if (stdout.indexOf('test_file_1.txt') > -1) {
-                            assert.notInclude(stdout, 'test2_file_2.txt');
-                        }
-                        if (stdout.indexOf('test2_file_2.txt') > -1) {
-                            assert.notInclude('test_file_1.txt');
-                        }
-                        assert.equal(code, 0);
-                        done();
-                    });
-                });
-
-                it('should return a random file with tag test', function (done) {
-                    run(['random', 'test'], function (err, code, stdout) {
-                        assert.notInclude(stdout, 'test2_file_2.txt');
-                        assert.include(stdout, 'test_file_1.txt');
-                        assert.equal(code, 0);
-                        done();
-                    });
-                });
-
             });
+
+            it('should have one file with tag unique', function (done) {
+                run(['tagged', 'unique'], function (err, code, stdout) {
+                    assert.equal(code, 0);
+                    assert.include(stdout, 'unique.txt');
+                    done();
+                });
+            });
+
+            it('should have two files with tag file', function (done) {
+                run(['tagged', 'file'], function (err, code, stdout) {
+                    assert.equal(code, 0);
+                    assert.include(stdout, 'test_file_1.txt');
+                    assert.include(stdout, 'test2_file_2.txt');
+                    done();
+                });
+            });
+
+            it('should return a random file with all tags', function (done) {
+                run(['random'], function (err, code, stdout) {
+                    if (stdout.indexOf('test_file_1.txt') > -1) {
+                        assert.notInclude(stdout, 'test2_file_2.txt');
+                    }
+                    if (stdout.indexOf('test2_file_2.txt') > -1) {
+                        assert.notInclude('test_file_1.txt');
+                    }
+                    assert.equal(code, 0);
+                    done();
+                });
+            });
+
+            it('should return a random file with tag test', function (done) {
+                run(['random', 'unique'], function (err, code, stdout) {
+                    assert.notInclude(stdout, 'test2_file_2.txt');
+                    assert.notInclude(stdout, 'test_file_1.txt');
+                    assert.include(stdout, 'unique.txt');
+                    assert.equal(code, 0);
+                    done();
+                });
+            });
+
         });
+
+
     });
 });
