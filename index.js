@@ -29,15 +29,16 @@ program
     .option('-d --directory <directory>', 'Taggit work directory');
 
 program
-    .command('init')
+    .command('init [directory]')
     .description('Initialize directory for file tagging')
     .action(function (dir) {
-        repo(dir).init(function (err, initialized) {
+        var repo = makeRepo(dir);
+        repo.init(function (err, initialized) {
             if (!err) {
                 if (initialized) {
-                    console.log("Initialized %s", dir);
+                    console.log("Initialized %s", repo.workDir);
                 } else {
-                    console.log("%s is already initialized", dir);
+                    console.log("%s is already initialized", repo.workDir);
                     process.exit(1);
                 }
             } else {
@@ -52,14 +53,14 @@ program
     .command('update')
     .description('Update the index by adding new files and removing missing ones')
     .action(function () {
-        repo().update();
+        makeRepo().update();
     });
 
 program
     .command('autotag')
     .description('Automatically tag all files extracting tags from their filenames')
     .action(function (options) {
-        repo().autotag();
+        makeRepo().autotag();
     });
 
 program
@@ -68,7 +69,7 @@ program
     .action(function (f, tag, otherTags) {
         var allTags = otherTags || [];
         allTags.push(tag);
-        repo().tag(f, allTags, function (err, tagged) {
+        makeRepo().tag(f, allTags, function (err, tagged) {
             if (err && err.code === 'ENOENT') {
                 console.log('Can\'t tag inexistent file ' + f);
                 process.exit(1);
@@ -83,10 +84,10 @@ program
     .description('List tags for file. If no file is given list all available tags')
     .action(function (f, options) {
         if (f) {
-            console.log(repo().tags(f));
+            console.log(makeRepo().tags(f));
         }
         else {
-            repo().allTags().forEach(function (tag) {
+            makeRepo().allTags().forEach(function (tag) {
                 console.log(tag);
             });
         }
@@ -100,7 +101,7 @@ program
     .action(function (tag, tags) {
         tags = tags || [];
         tags.push(tag);
-        var files = repo().tagged(tags);
+        var files = makeRepo().tagged(tags);
         if (files) {
             files.forEach(function (f) {
                 console.log(f.name);
@@ -116,21 +117,21 @@ program
     .action(function (f, tag, tags) {
         var allTags = tags || [];
         allTags.push(tag);
-        repo().untag(f, allTags);
+        makeRepo().untag(f, allTags);
     });
 
 program
     .command('remove <file>')
     .description('remove file from index')
     .action(function (f) {
-        repo().remove(f);
+        makeRepo().remove(f);
     });
 
 program
     .command('random [tags...]')
     .description('Choose a random file matching the specified tags.')
     .action(function (tags, options) {
-        var f = repo().random(tags);
+        var f = makeRepo().random(tags);
         if (f) {
             console.log(f.name);
         } else {
@@ -159,7 +160,7 @@ if (program.args.length === 0) {
  *
  * @returns {exports.Tagit}
  */
-function repo(dir) {
+function makeRepo(dir) {
     if (!dir) {
         dir = !!program.directory ? program.directory : ".";
     }
