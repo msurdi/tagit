@@ -5,6 +5,7 @@ Tagit is a command line tool for tagging files. It could be used as a quick'n di
 library.
 
 
+
 Installation
 ------------
 
@@ -22,3 +23,4 @@ Usage
     tagit random                    // Pick a random file
     tagit random pop                // Pick a random file tagged with 'pop'
     tagit tag my_song.mp3 favourite // Tag my_song.mp3 with tag 'favourite'
+    
