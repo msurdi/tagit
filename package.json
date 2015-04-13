@@ -12,9 +12,19 @@
   "keywords": [
     "file",
     "tag",
-    "indexing"
+    "tagging"
   ],
-  "author": "Matias Surdi",
+  "author": {
+    "name": "Matias Surdi",
+    "email": "matias@surdi.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/msurdi/tagit"
+  },
+  "bugs": {
+    "url": "https://github.com/msurdi/tagit/issues"
+  },
   "license": "BSD",
   "dependencies": {
     "commander": "^2.6.0",
