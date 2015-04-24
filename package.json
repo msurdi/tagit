@@ -34,6 +34,7 @@
   "devDependencies": {
     "chai": "<2.2",
     "chai-fs": "git://github.com/carrot/chai-fs.git#version-bump",
+    "chai-string": "^1.1.1",
     "mocha": "*",
     "tmp": "0.0.25"
   }

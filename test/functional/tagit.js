@@ -8,6 +8,7 @@ var NODE = 'node';
 var INDEX = path.join(__dirname, '../../index.js');
 
 chai.use(require('chai-fs'));
+chai.use(require('chai-string'));
 
 var assert = chai.assert;
 
@@ -157,6 +158,13 @@ describe("when not yet initialized", function () {
                 run(['update'], function (err) {
                     if (err) throw err;
                     run(['autotag'], done);
+                });
+            });
+
+            it('should not start with absolute paths', function(done){
+                run(['tagged', 'unique'], function(err, code, stdout){
+                    assert.notStartsWith(stdout, "/");
+                    done();
                 });
             });
 
