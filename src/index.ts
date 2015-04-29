@@ -1,10 +1,9 @@
-#!/usr/bin/env node
+/// <reference path="types/node/node.d.ts" />
+/// <reference path="types/commander/commander.d.ts" />
+import program = require('commander');
+import tagit = require('./lib/tagit');
 
-"use strict";
-
-var program = require('commander');
-var tagit = require('./lib/tagit');
-var workDir = '.';
+let workDir = '.';
 
 
 /**

@@ -1,9 +1,12 @@
-"use strict";
+/// <reference path="../types/node/node.d.ts" />
+import path = require('path');
+import fs = require('fs');
 
-var path = require('path');
-var fs = require('fs');
-var findit = require('findit');
-var _ = require('underscore');
+/// <reference path="../types/findit/findit.d.ts" />
+import findit = require('findit');
+
+/// <reference path="../types/underscore/underscore.d.ts" />
+import _ = require('underscore');
 
 
 var TAGIT_DIR = '.tagit';
