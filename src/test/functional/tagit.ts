@@ -8,14 +8,12 @@ import path = require('path');
 import ncp = require('ncp');
 import fs = require('fs');
 
-var NODE = 'node';
-var INDEX = path.join(__dirname, '../../../dist/index.js');
+const BIN = path.join(__dirname, '../../../bin/tagit');
 
-var assert = chai.assert;
+const assert = chai.assert;
 
-function run(args, cb) {
-    args = !!args ? args : [];
-    var process = spawn.spawn(NODE, [INDEX].concat(args));
+function run(args = [], cb:Function = null) {
+    var process = spawn.spawn(BIN, [].concat(args));
     var stdout = '', stderr = '';
     process.stdout.on('data', function (data) {
         stdout += data.toString();
@@ -25,7 +23,9 @@ function run(args, cb) {
     });
 
     process.on('close', function (code) {
-        return cb(null, code, stdout, stderr);
+        if (typeof cb == 'function') {
+            return cb(null, code, stdout, stderr);
+        }
     });
 }
 
@@ -215,7 +215,5 @@ describe("when not yet initialized", function () {
             });
 
         });
-
-
     });
 });
