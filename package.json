@@ -7,7 +7,7 @@
     "tagit": "./index.js"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --recursive"
+    "test": "./node_modules/.bin/mocha src --recursive"
   },
   "keywords": [
     "file",
