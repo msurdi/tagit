@@ -40,10 +40,10 @@ export class Tagit {
     init(cb?:Function) {
         var self = this;
         var dir = path.join(self.workDir, TAGIT_DIR);
-        fs.stat(dir, function (err) {
+        fs.stat(dir, (err)  => {
             if (!err) return callback(cb, null, false);
             if (err.code === 'ENOENT') {
-                fs.mkdir(dir, function (err) {
+                fs.mkdir(dir, (err) => {
                     if (err) return callback(cb, err);
                     save(self.workDir, {files: {}});
                     return callback(cb, null, true);
@@ -59,18 +59,18 @@ export class Tagit {
         var finder = findit(self.workDir);
         var data = load(self.workDir);
 
-        finder.on('file', function (f) {
+        finder.on('file', (f)  => {
             if (f.indexOf('.') !== 0) {
                 self._add(data, f);
             }
         });
 
-        finder.on('end', function () {
+        finder.on('end', () => {
             save(self.workDir, data);
             return callback(cb);
         });
 
-        finder.on('error', function (err) {
+        finder.on('error', (err) => {
             console.warn("processing %s: %s", err.path, err.code);
         });
     }
@@ -78,7 +78,7 @@ export class Tagit {
     autotag() {
         var self = this;
         var data = load(self.workDir);
-        _.each(data.files, function (f) {
+        _.each(data.files, (f)  => {
             data.files[f.name].tags = mergeTags(data.files[f.name].tags || [], extractTags(f.name));
         });
         save(self.workDir, data);
@@ -96,7 +96,7 @@ export class Tagit {
     tag(f:string, tags:string[], cb:Function) {
         var self = this;
         var data = load(self.workDir);
-        fs.stat(f, function (err) {
+        fs.stat(f, (err)  => {
             if (err && err.code === 'ENOENT') {
                 return callback(cb, err, false);
             } else {
@@ -145,7 +145,7 @@ export class Tagit {
         var self = this;
         var data = load(self.workDir);
         var matchingFiles:Entry[] = [];
-        _.each(data.files, function (f) {
+        _.each(data.files, (f)  => {
             if (f.tags) {
                 if (_.intersection(f.tags, tags).length === tags.length) {
                     matchingFiles.push(f);
@@ -173,8 +173,7 @@ export class Tagit {
 }
 
 
-// Private functions
-
+// Helper functions
 function findDataDir(workDir:string) {
     var absworkDir = path.resolve(path.join(workDir, TAGIT_DIR));
     var stat = fs.statSync(absworkDir);
@@ -200,7 +199,7 @@ function save(workDir:string, data:Repository) {
 
 function mergeTags(oldTags:string[] = [], newTags:string[] = []) {
     var tags = oldTags.concat(newTags);
-    tags = tags.map(function (tag) {
+    tags = tags.map((tag)  => {
         return tag.toLowerCase()
     });
     return _.uniq(tags)
@@ -210,7 +209,7 @@ function extractTags(f:string) {
     var tags = [];
     if (f) {
         tags = f.split(/[^A-Za-z]/);
-        tags = _.filter(tags, function (tag) {
+        tags = _.filter(tags, (tag)  => {
             return tag.length > 2;
         });
     }

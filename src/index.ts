@@ -9,7 +9,7 @@ import path = require('path');
  *  Global error handler, last step before crashing.
  */
 
-process.on('uncaughtException', function (err:any) {
+process.on('uncaughtException', (err:any) => {
     if (err instanceof tagit.NoRepositoryError) {
         console.log(err.message);
     } else {
@@ -32,9 +32,9 @@ program
 program
     .command('init [directory]')
     .description('Initialize directory for file tagging')
-    .action(function (dir) {
+    .action((dir)  => {
         var repo = makeRepo(dir);
-        repo.init(function (err, initialized) {
+        repo.init((err, initialized)  => {
             if (!err) {
                 if (initialized) {
                     console.log("Initialized %s", repo.workDir);
@@ -53,24 +53,24 @@ program
 program
     .command('update')
     .description('Update the index by adding new files and removing missing ones')
-    .action(function () {
+    .action(()  => {
         makeRepo().update();
     });
 
 program
     .command('autotag')
     .description('Automatically tag all files extracting tags from their filenames')
-    .action(function () {
+    .action(()  => {
         makeRepo().autotag();
     });
 
 program
     .command('tag <file> <tag> [tags...]')
     .description("Tag a file with the given tags")
-    .action(function (f, tag, otherTags) {
+    .action((f, tag, otherTags) => {
         var allTags = otherTags || [];
         allTags.push(tag);
-        makeRepo().tag(f, allTags, function (err) {
+        makeRepo().tag(f, allTags, (err)  => {
             if (err && err.code === 'ENOENT') {
                 console.log('Can\'t tag inexistent file ' + f);
                 process.exit(1);
@@ -83,12 +83,12 @@ program
 program
     .command('tags [file]')
     .description('List tags for file. If no file is given list all available tags')
-    .action(function (f) {
+    .action((f)  => {
         if (f) {
             console.log(makeRepo().tags(f));
         }
         else {
-            makeRepo().allTags().forEach(function (tag) {
+            makeRepo().allTags().forEach((tag)  => {
                 console.log(tag);
             });
         }
@@ -99,12 +99,12 @@ program
 program
     .command('tagged <tag> [tags...]')
     .description('List files matching all given tags')
-    .action(function (tag, tags) {
+    .action((tag, tags)  => {
         tags = tags || [];
         tags.push(tag);
         var files = makeRepo().tagged(tags);
         if (files) {
-            files.forEach(function (f) {
+            files.forEach((f)  => {
                 console.log(f.name);
             });
         } else {
@@ -115,7 +115,7 @@ program
 program
     .command('untag <file> <tag> [tags...]')
     .description('Remove all given tags from file')
-    .action(function (f, tag, tags) {
+    .action((f, tag, tags)  => {
         var allTags = tags || [];
         allTags.push(tag);
         makeRepo().untag(f, allTags);
@@ -124,14 +124,14 @@ program
 program
     .command('remove <file>')
     .description('remove file from index')
-    .action(function (f) {
+    .action((f)  => {
         makeRepo().remove(f);
     });
 
 program
     .command('random [tags...]')
     .description('Choose a random file matching the specified tags.')
-    .action(function (tags) {
+    .action((tags)  => {
         var f = makeRepo().random(tags);
         if (f) {
             console.log(f.name);
@@ -143,7 +143,7 @@ program
 program
     .command('*')
     .description('')
-    .action(function (args) {
+    .action((args)  => {
         console.log('Unknown action %s', args);
         program.help();
     });
