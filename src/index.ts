@@ -1,6 +1,7 @@
-/// <reference path="types/node/node.d.ts" />
-/// <reference path="types/commander/commander.d.ts" />
+/// <reference path="../typings/tsd.d.ts" />
+
 import program = require('commander');
+
 import tagit = require('./lib/tagit');
 
 /**

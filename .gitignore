@@ -1,4 +1,5 @@
 node_modules
 .tagit
 .tscache
+typings
 dist
