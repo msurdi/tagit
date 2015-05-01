@@ -1,20 +1,21 @@
-var chai = require('chai');
-var spawn = require('child_process').spawn;
-var tmp = require('tmp');
-var path = require('path');
-var ncp = require('ncp').ncp;
+/// <reference path="../../typings/all.d.ts" />
+require('source-map-support').install();
+
+import chai = require('chai');
+import spawn = require('child_process');
+import tmp = require('tmp');
+import path = require('path');
+import ncp = require('ncp');
+import fs = require('fs');
 
 var NODE = 'node';
 var INDEX = path.join(__dirname, '../../../dist/index.js');
-
-chai.use(require('chai-fs'));
-chai.use(require('chai-string'));
 
 var assert = chai.assert;
 
 function run(args, cb) {
     args = !!args ? args : [];
-    var process = spawn(NODE, [INDEX].concat(args));
+    var process = spawn.spawn(NODE, [INDEX].concat(args));
     var stdout = '', stderr = '';
     process.stdout.on('data', function (data) {
         stdout += data.toString();
@@ -57,15 +58,20 @@ describe("when not yet initialized", function () {
 
     it('should create file structore on init', function (done) {
         run(['init', workDir], function () {
-            assert.isDirectory(path.join(workDir, '.tagit'));
-            assert.isFile(path.join(workDir, '.tagit/data.json'));
-            done();
+            fs.stat(path.join(workDir, '.tagit'), function (err, stat) {
+                if (err) throw err;
+                assert.isTrue(stat.isDirectory());
+                fs.stat(path.join(workDir, '.tagit/data.json'), function (err, stat) {
+                    assert.isTrue(stat.isFile());
+                    done();
+                });
+            });
         })
     });
 
     describe("when initialized", function () {
         beforeEach(function (done) {
-            ncp(path.join(__dirname, '../fixtures'), workDir, function (err) {
+            ncp.ncp(path.join(__dirname, '../../../src/test/fixtures'), workDir, function (err) {
                 if (err) throw err;
                 run(['init', workDir], done);
             });
@@ -161,9 +167,9 @@ describe("when not yet initialized", function () {
                 });
             });
 
-            it('should not start with absolute paths', function(done){
-                run(['tagged', 'unique'], function(err, code, stdout){
-                    assert.notStartsWith(stdout, "/");
+            it('should not start with absolute paths', function (done) {
+                run(['tagged', 'unique'], function (err, code, stdout:string) {
+                    assert.isFalse(stdout.charAt(0) == "/");
                     done();
                 });
             });
@@ -191,7 +197,7 @@ describe("when not yet initialized", function () {
                         assert.notInclude(stdout, 'test2_file_2.txt');
                     }
                     if (stdout.indexOf('test2_file_2.txt') > -1) {
-                        assert.notInclude('test_file_1.txt');
+                        assert.notInclude(stdout, 'test_file_1.txt');
                     }
                     assert.equal(code, 0);
                     done();
