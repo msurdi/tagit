@@ -12,7 +12,7 @@ const BIN = path.join(__dirname, '../../../bin/tagit');
 const assert = chai.assert;
 
 function run(args = [], cb:Function = null) {
-    var process = spawn.spawn(BIN, [].concat(args));
+    var process = spawn.spawn(BIN, args);
     var stdout = '', stderr = '';
     process.stdout.on('data', function (data) {
         stdout += data.toString();
