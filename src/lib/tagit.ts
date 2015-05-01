@@ -100,11 +100,11 @@ export class Tagit {
         var data = load(self.workDir);
         fs.stat(f, function (err) {
             if (err && err.code === 'ENOENT') {
-                return cb(cb, err, false);
+                return callback(cb, err, false);
             } else {
                 data = self._add(data, f, tags);
                 save(self.workDir, data);
-                return cb(cb, null, true);
+                return callback(cb, null, true);
             }
         });
     }
