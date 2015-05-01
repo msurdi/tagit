@@ -4,10 +4,12 @@
   "description": "File tagging tool",
   "main": "index.js",
   "bin": {
-    "tagit": "./index.js"
+    "tagit": "./bin/tagit"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha src --recursive"
+    "test": "./node_modules/.bin/mocha dist/test/ --recursive",
+    "prepublish": "cd src && ../node_modules/.bin/tsc",
+    "pretest": "cd src && ../node_modules/.bin/tsc"
   },
   "keywords": [
     "file",
@@ -29,12 +31,12 @@
   "dependencies": {
     "commander": "^2.6.0",
     "findit": "^2.0.0",
+    "source-map-support": "^0.2.10",
+    "typescript": "^1.5.0-alpha",
     "underscore": "^1.7.0"
   },
   "devDependencies": {
     "chai": "<2.2",
-    "chai-fs": "git://github.com/carrot/chai-fs.git#version-bump",
-    "chai-string": "^1.1.1",
     "mocha": "*",
     "tmp": "0.0.25"
   }

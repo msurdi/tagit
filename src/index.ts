@@ -1,5 +1,5 @@
-/// <reference path="../typings/tsd.d.ts" />
-
+/// <reference path="typings/all.d.ts" />
+require('source-map-support').install();
 import program = require('commander');
 import tagit = require('./lib/tagit');
 import fs = require('fs');
@@ -148,10 +148,13 @@ program
         program.help();
     });
 
-program.parse(process.argv);
 
-if (program.args.length === 0) {
-    program.help();
+export function run() {
+    program.parse(process.argv);
+
+    if (program.args.length === 0) {
+        program.help();
+    }
 }
 
 // utility functions
