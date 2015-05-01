@@ -3,14 +3,12 @@
 import program = require('commander');
 import tagit = require('./lib/tagit');
 
-let workDir = '.';
-
-
 /**
  *  Global error handler, last step before crashing.
  */
-process.on('uncaughtException', function (err) {
-    if (err instanceof tagit.NoDataError) {
+
+process.on('uncaughtException', function (err:any) {
+    if (err instanceof tagit.NoRepositoryError) {
         console.log(err.message);
     } else {
         console.log('Unhandled error: %s', err);
@@ -20,9 +18,6 @@ process.on('uncaughtException', function (err) {
 });
 
 
-/**
- *  Main CLI parameters
- */
 program
     .version('0.0.1')
     .option('-d --directory <directory>', 'Taggit work directory');
@@ -58,7 +53,7 @@ program
 program
     .command('autotag')
     .description('Automatically tag all files extracting tags from their filenames')
-    .action(function (options) {
+    .action(function () {
         makeRepo().autotag();
     });
 
@@ -68,7 +63,7 @@ program
     .action(function (f, tag, otherTags) {
         var allTags = otherTags || [];
         allTags.push(tag);
-        makeRepo().tag(f, allTags, function (err, tagged) {
+        makeRepo().tag(f, allTags, function (err) {
             if (err && err.code === 'ENOENT') {
                 console.log('Can\'t tag inexistent file ' + f);
                 process.exit(1);
@@ -81,7 +76,7 @@ program
 program
     .command('tags [file]')
     .description('List tags for file. If no file is given list all available tags')
-    .action(function (f, options) {
+    .action(function (f) {
         if (f) {
             console.log(makeRepo().tags(f));
         }
@@ -129,7 +124,7 @@ program
 program
     .command('random [tags...]')
     .description('Choose a random file matching the specified tags.')
-    .action(function (tags, options) {
+    .action(function (tags) {
         var f = makeRepo().random(tags);
         if (f) {
             console.log(f.name);
@@ -157,11 +152,11 @@ if (program.args.length === 0) {
 /**
  * Create a Tagit instance for the current work directory;
  *
- * @returns {exports.Tagit}
+ * @returns {Tagit}
  */
-function makeRepo(dir) {
+function makeRepo(dir?:string) {
     if (!dir) {
-        dir = !!program.directory ? program.directory : ".";
+        dir = !!program.optionFor('directory') ? program.optionFor('directory').toString() : ".";
     }
     return new tagit.Tagit(dir);
 }

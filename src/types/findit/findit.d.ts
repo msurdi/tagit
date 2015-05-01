@@ -1,3 +1,6 @@
-export = findit;
+declare function findit(...args: any[]): any;
+declare module "findit" {
+    export = findit;
+}
 
-declare var findit: any;
+
