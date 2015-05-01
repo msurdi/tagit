@@ -5,7 +5,7 @@ var path = require('path');
 var ncp = require('ncp').ncp;
 
 var NODE = 'node';
-var INDEX = path.join(__dirname, '../../index.js');
+var INDEX = path.join(__dirname, '../../../dist/index.js');
 
 chai.use(require('chai-fs'));
 chai.use(require('chai-string'));
@@ -49,14 +49,14 @@ describe("when not yet initialized", function () {
     it('should print help when no args', function (done) {
         run([], function (err, code, stdout) {
             assert.include(stdout, 'Usage');
-            assert.include(stdout, 'Commands')
-            assert.include(stdout, 'Options')
+            assert.include(stdout, 'Commands');
+            assert.include(stdout, 'Options');
             done();
         });
     });
 
     it('should create file structore on init', function (done) {
-        run(['init', workDir], function (err, code, stdout) {
+        run(['init', workDir], function () {
             assert.isDirectory(path.join(workDir, '.tagit'));
             assert.isFile(path.join(workDir, '.tagit/data.json'));
             done();
@@ -104,7 +104,7 @@ describe("when not yet initialized", function () {
 
         describe('when there are files manually tagged', function () {
             beforeEach(function (done) {
-                run(['tag', 'test_file_1.txt', 'sometag', 'sometag2'], function (err) {
+                run(['tag', 'test_file_1.txt', 'sometag', 'sometag2'], function () {
                     run(['tag', 'test2_file_2.txt', 'sometag2'], done);
                 });
             });
