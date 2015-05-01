@@ -1,9 +1,7 @@
-/// <reference path="../../typings/tsd.d.ts" />
+/// <reference path="../typings/all.d.ts" />
 import path = require('path');
 import fs = require('fs');
 import _ = require('underscore');
-
-/// <reference path="../typings/findit/findit.d.ts" />
 import findit = require('findit');
 
 
