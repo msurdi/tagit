@@ -13,6 +13,18 @@
     },
     "commander/commander.d.ts": {
       "commit": "7acdb48f24afc060260818c5937f471d73331807"
+    },
+    "chai/chai.d.ts": {
+      "commit": "1c18e97550dda6a226cd66719edc37af0e5183c4"
+    },
+    "mocha/mocha.d.ts": {
+      "commit": "1c18e97550dda6a226cd66719edc37af0e5183c4"
+    },
+    "ncp/ncp.d.ts": {
+      "commit": "1c18e97550dda6a226cd66719edc37af0e5183c4"
+    },
+    "tmp/tmp.d.ts": {
+      "commit": "1400e07731048ae841bcebed658cb68539cbfb99"
     }
   }
 }
