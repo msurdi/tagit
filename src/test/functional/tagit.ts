@@ -9,7 +9,6 @@ import ncp = require('ncp');
 import fs = require('fs');
 
 const BIN = path.join(__dirname, '../../../bin/tagit');
-
 const assert = chai.assert;
 
 function run(args = [], cb:Function = null) {
@@ -78,7 +77,7 @@ describe("when not yet initialized", function () {
         });
 
         it('should fail to init already initialized directories', function (done) {
-            run(['init', workDir], function (err, code, stdout) {
+            run(['init', workDir], function (err, code) {
                 assert.notEqual(code, 0);
                 done();
             });
