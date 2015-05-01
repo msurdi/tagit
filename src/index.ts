@@ -1,8 +1,8 @@
 /// <reference path="../typings/tsd.d.ts" />
 
 import program = require('commander');
-
 import tagit = require('./lib/tagit');
+import fs = require('fs');
 
 /**
  *  Global error handler, last step before crashing.
@@ -19,8 +19,12 @@ process.on('uncaughtException', function (err:any) {
 });
 
 
+function loadMetadata(): any{
+    return JSON.parse(fs.readFileSync('package.json', 'utf8'));
+}
+
 program
-    .version('0.0.1')
+    .version(loadMetadata().version)
     .option('-d --directory <directory>', 'Taggit work directory');
 
 program
