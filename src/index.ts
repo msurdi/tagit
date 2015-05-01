@@ -3,6 +3,7 @@
 import program = require('commander');
 import tagit = require('./lib/tagit');
 import fs = require('fs');
+import path = require('path');
 
 /**
  *  Global error handler, last step before crashing.
@@ -19,8 +20,9 @@ process.on('uncaughtException', function (err:any) {
 });
 
 
-function loadMetadata(): any{
-    return JSON.parse(fs.readFileSync('package.json', 'utf8'));
+function loadMetadata():any {
+    var appDir = path.dirname(require.main.filename);
+    return JSON.parse(fs.readFileSync(path.join(appDir, '../package.json'), 'utf8'));
 }
 
 program
