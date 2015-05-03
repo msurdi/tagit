@@ -38,14 +38,13 @@ export class Tagit {
     }
 
     init(cb?:Function) {
-        var self = this;
-        var dir = path.join(self.workDir, TAGIT_DIR);
+        var dir = path.join(this.workDir, TAGIT_DIR);
         fs.stat(dir, (err)  => {
             if (!err) return callback(cb, null, false);
             if (err.code === 'ENOENT') {
                 fs.mkdir(dir, (err) => {
                     if (err) return callback(cb, err);
-                    save(self.workDir, {files: {}});
+                    save(this.workDir, {files: {}});
                     return callback(cb, null, true);
                 });
             } else {
@@ -55,18 +54,17 @@ export class Tagit {
     }
 
     update(cb?:Function) {
-        var self = this;
-        var finder = findit(self.workDir);
-        var data = load(self.workDir);
+        var finder = findit(this.workDir);
+        var data = load(this.workDir);
 
         finder.on('file', (f)  => {
             if (f.indexOf('.') !== 0) {
-                self._add(data, f);
+                this._add(data, f);
             }
         });
 
         finder.on('end', () => {
-            save(self.workDir, data);
+            save(this.workDir, data);
             return callback(cb);
         });
 
@@ -76,40 +74,36 @@ export class Tagit {
     }
 
     autotag() {
-        var self = this;
-        var data = load(self.workDir);
+        var data = load(this.workDir);
         _.each(data.files, (f)  => {
             data.files[f.name].tags = mergeTags(data.files[f.name].tags || [], extractTags(f.name));
         });
-        save(self.workDir, data);
+        save(this.workDir, data);
     }
 
     remove(f:string) {
-        var self = this;
-        var data = load(self.workDir);
+        var data = load(this.workDir);
         if (data.files && data.files[f]) {
             delete data.files[f];
-            save(self.workDir, data);
+            save(this.workDir, data);
         }
     }
 
     tag(f:string, tags:string[], cb:Function) {
-        var self = this;
-        var data = load(self.workDir);
+        var data = load(this.workDir);
         fs.stat(f, (err)  => {
             if (err && err.code === 'ENOENT') {
                 return callback(cb, err, false);
             } else {
-                data = self._add(data, f, tags);
-                save(self.workDir, data);
+                data = this._add(data, f, tags);
+                save(this.workDir, data);
                 return callback(cb, null, true);
             }
         });
     }
 
     untag(f:string, tags:string[]) {
-        var self = this;
-        var data = load(self.workDir);
+        var data = load(this.workDir);
         if (data.files && data.files[f] && data.files[f].tags) {
             var oldTags:string[] = data.files[f].tags || [];
             var newTags:string[] = oldTags;
@@ -117,13 +111,12 @@ export class Tagit {
                 newTags = _.without<string>(oldTags, ...tags);
             }
             data.files[f].tags = newTags;
-            save(self.workDir, data);
+            save(this.workDir, data);
         }
     }
 
     tags(f:string) {
-        var self = this;
-        var data = load(self.workDir);
+        var data = load(this.workDir);
         var tags = [];
         if (data.files && data.files[f] && data.files[f].tags) {
             tags = data.files[f].tags;
@@ -132,8 +125,7 @@ export class Tagit {
     }
 
     allTags():string[] {
-        var self = this;
-        var data = load(self.workDir);
+        var data = load(this.workDir);
         var tags = [];
         _.each(data.files, function (f) {
             tags = tags.concat(f.tags);
@@ -142,8 +134,7 @@ export class Tagit {
     }
 
     tagged(tags:string[]):Entry[] {
-        var self = this;
-        var data = load(self.workDir);
+        var data = load(this.workDir);
         var matchingFiles:Entry[] = [];
         _.each(data.files, (f)  => {
             if (f.tags) {
@@ -156,8 +147,7 @@ export class Tagit {
     }
 
     random(tags:string[]):Entry {
-        var self = this;
-        return _.sample<Entry>(self.tagged(tags));
+        return _.sample<Entry>(this.tagged(tags));
     }
 
     _add(data:Repository, f:string, tags?:string[]) {
