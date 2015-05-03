@@ -31,9 +31,8 @@ export class NoRepositoryError implements Error {
 }
 
 export class Tagit {
-    workDir:string;
 
-    constructor(workDir:string) {
+    constructor(private workDir:string) {
         this.workDir = path.resolve(workDir || '.');
     }
 
