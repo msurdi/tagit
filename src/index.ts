@@ -37,9 +37,9 @@ program
         repo.init((err, initialized)  => {
             if (!err) {
                 if (initialized) {
-                    console.log("Initialized %s", repo.workDir);
+                    console.log("Initialized %s", repo.getWorkDir());
                 } else {
-                    console.log("%s is already initialized", repo.workDir);
+                    console.log("%s is already initialized", repo.getWorkDir());
                     process.exit(1);
                 }
             } else {

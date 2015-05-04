@@ -52,6 +52,10 @@ export class Tagit {
         });
     }
 
+    getWorkDir():string {
+        return this.workDir;
+    }
+
     update(cb?:Function) {
         var finder = findit(this.workDir);
         var data = load(this.workDir);
