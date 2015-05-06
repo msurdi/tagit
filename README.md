@@ -17,7 +17,8 @@ Usage
 
     cd ~/Music                      // Or anywhere where you have your files
     tagit init                      // Initialize internal database
-    tagit autotag                   // Tag all files extracting tags from filenames
+    tagit update                    // Recursively scan current directory and add all files to the index
+    tagit autotag                   // Tag all files in the index extracting tags from filenames
     tagit tagged rock               // List all files tagged with 'rock'
     tagit tagged rock heavy         // List all files tagged with 'rock' and 'heavy'
     tagit random                    // Pick a random file
