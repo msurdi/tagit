@@ -11,7 +11,7 @@
     "prepublish": "cd src && ../node_modules/.bin/tsc",
     "pretest": "cd src && ../node_modules/.bin/tsc"
   },
-  "files": ["dist", "bin"],
+  "files": ["dist", "bin", "src"],
   "keywords": [
     "file",
     "tag",
