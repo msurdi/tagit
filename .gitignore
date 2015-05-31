@@ -1,5 +1,5 @@
 node_modules
 .tagit
 .tscache
-typings
-dist
+/typings
+/dist
