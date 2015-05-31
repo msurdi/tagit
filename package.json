@@ -8,8 +8,8 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha dist/test/ --recursive",
-    "prepublish": "cd src && ../node_modules/.bin/tsc",
-    "pretest": "cd src && ../node_modules/.bin/tsc"
+    "prepublish": "./node_modules/.bin/tsd update && ./node_modules/.bin/tsd rebundle && cd src && ../node_modules/.bin/tsc",
+    "pretest": "./node_modules/.bin/tsd update && ./node_modules/.bin/tsd rebundle && cd src && ../node_modules/.bin/tsc",
   },
   "files": ["dist", "bin", "src"],
   "keywords": [
