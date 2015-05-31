@@ -34,7 +34,8 @@
     "findit": "2.0.0",
     "source-map-support": "0.2.10",
     "typescript": "1.5.0-alpha",
-    "underscore": "1.7.0"
+    "underscore": "1.7.0",
+    "ncp": "2.0.0"
   },
   "devDependencies": {
     "chai": "2.1.2",
