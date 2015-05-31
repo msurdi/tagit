@@ -28,7 +28,7 @@
   "bugs": {
     "url": "https://github.com/msurdi/tagit/issues"
   },
-  "license": "BSD",
+  "license": "MIT",
   "dependencies": {
     "commander": "^2.6.0",
     "findit": "^2.0.0",
